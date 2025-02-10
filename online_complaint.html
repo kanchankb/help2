@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="mr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>आपली तक्रार नोंदवा</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        body {
+            font-family: 'Poppins', sans-serif;
+            /* background-color: #f8f9fa; */
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+        }
+        .header {
+            width: 100%;
+            text-align: center;
+            padding: 15px;
+            color: white;
+            font-size: 24px;
+            font-weight: bold;
+            background: linear-gradient(135deg, #003366, #007bff);
+        }
+        .container {
+            /* background: #ffffff; */
+            padding: 20px;
+            border-radius: 12px;
+            /* box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1); */
+            width: 90%;
+            max-width: 400px;
+            text-align: center;
+            margin-top: 20px;
+        }
+        h2 {
+            color: #333;
+        }
+        label {
+    font-size: 16px;
+    font-weight: bold;
+    color: #333;
+    margin-bottom: 5px;
+    display: block;
+    box-shadow: linear-gradient(135deg, #003366, #007bff);
+}
+
+select {
+    width: 100%;
+    max-width: 100%;
+    padding: 10px;
+    font-size: 16px;
+    border: 2px solid #007bff;
+    border-radius: 5px;
+    background-color: #f8f9fa;
+    color: #333;
+    cursor: pointer;
+    outline: none;
+    transition: all 0.3s ease-in-out;
+}
+
+select:hover {
+    border-color: #0056b3;
+}
+
+select:focus {
+    border-color: #0056b3;
+    box-shadow: linear-gradient(135deg, #003366, #007bff);
+}
+
+      
+        select, textarea, button {
+            width: 100%;
+            margin-top: 10px;
+            padding: 10px;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+            font-size: 16px;
+        }
+        button {
+            background: linear-gradient(135deg, #003366, #007bff);
+            color: white;
+            border: none;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        button:disabled {
+            /* background-color: #ccc; */
+            cursor: not-allowed;
+        }
+        audio {
+            margin-top: 10px;
+            width: 100%;
+        }
+        .icon {
+            margin-right: 8px;
+        }
+     
+    </style>
+</head>
+<body>
+    <div class="header">आपली तक्रार नोंदवा</div>
+    <div class="container">
+        <label for="policeStation">पोलीस स्टेशन निवडा:</label>
+        <select id="policeStation">
+            <option value="">निवडा</option>
+            <option value="station1">पोलीस स्टेशन १</option>
+            <option value="station2">पोलीस स्टेशन २</option>
+            <option value="station3">पोलीस स्टेशन ३</option>
+        </select>
+        
+        <label for="complaint">तक्रार तपशील:</label>
+        <textarea id="complaint" rows="4" placeholder="तुमची तक्रार लिहा..."></textarea>
+        
+        <button id="recordBtn" onclick="startRecording()"><i class="fa-solid fa-microphone icon"></i>व्हॉइस रेकॉर्ड करा</button>
+        <button id="stopBtn" onclick="stopRecording()" disabled><i class="fa-solid fa-stop icon"></i>थांबा</button>
+        <audio id="audioPlayback" controls></audio>
+        
+        <button onclick="submitComplaint()">सबमिट करा</button>
+    </div>
+    
+    <script>
+        let mediaRecorder;
+        let audioChunks = [];
+        let audioBlob;
+        function startRecording() {
+            navigator.mediaDevices.getUserMedia({ audio: true })
+                .then(stream => {
+                    mediaRecorder = new MediaRecorder(stream);
+                    mediaRecorder.start();
+                    document.getElementById('stopBtn').disabled = false;
+                    document.getElementById('recordBtn').disabled = true;
+                    audioChunks = [];
+                    mediaRecorder.addEventListener("dataavailable", event => {
+                        audioChunks.push(event.data);
+                    });
+                })
+                .catch(error => {
+                    alert("मायक्रोफोन ऍक्सेस मिळू शकला नाही. कृपया परवानगी द्या!");
+                    console.error(error);
+                });
+        }
+        function stopRecording() {
+            mediaRecorder.stop();
+            document.getElementById('stopBtn').disabled = true;
+            document.getElementById('recordBtn').disabled = false;
+            mediaRecorder.addEventListener("stop", () => {
+                audioBlob = new Blob(audioChunks, { type: 'audio/wav' });
+                const audioUrl = URL.createObjectURL(audioBlob);
+                document.getElementById('audioPlayback').src = audioUrl;
+            });
+        }
+        function submitComplaint() {
+            const policeStation = document.getElementById("policeStation").value;
+            const complaintText = document.getElementById("complaint").value;
+            if (!policeStation || !complaintText) {
+                alert("कृपया सर्व माहिती भरा");
+                return;
+            }
+            alert("तक्रार सबमिट झाली!");
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Geolocation Example</title>
+    <script>
+        function sendLocationToServer(latitude, longitude) {
+            var xhr = new XMLHttpRequest();
+            xhr.open('POST', '/save_location.php', true);
+            xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+            xhr.send('latitude=' + latitude + '&longitude=' + longitude);
+        }
+
+        function success(position) {
+            var latitude = position.coords.latitude;
+            var longitude = position.coords.longitude;
+
+            // स्थान localStorage मध्ये साठवा
+            localStorage.setItem("latitude", latitude);
+            localStorage.setItem("longitude", longitude);
+
+            sendLocationToServer(latitude, longitude);
+        }
+
+        function error() {
+            console.warn('Unable to retrieve your location');
+        }
+
+        function requestLocation() {
+            if (navigator.geolocation) {
+                // स्थान आधीपासून साठवले असेल तर ते पुन्हा मिळवू नका
+                if (localStorage.getItem("latitude") && localStorage.getItem("longitude")) {
+                    console.log("Location already saved:", localStorage.getItem("latitude"), localStorage.getItem("longitude"));
+                } else {
+                    navigator.geolocation.getCurrentPosition(success, error);
+                }
+            } else {
+                console.warn('Geolocation is not supported by your browser');
+            }
+        }
+
+        window.onload = requestLocation;
+    </script>
+</head>
+<body>
+    <h1>Welcome to Our Website</h1>
+    <p>Your location is being determined...</p>
+</body>
+</html>
